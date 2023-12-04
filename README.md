@@ -83,9 +83,9 @@ It should give you two different outputs as we're using a different algorithm, S
 For the next part, you ***should not*** record as explained below. Stop recording from here and
 submit all the files you created up to this point, including `.record/` and `.nvim/`.
 
-# Task 1: SSH Authentication with Public Cryptography
+# Task 1: SSH Authentication with Public Key Cryptography
 
-There are many applications of public cryptography and one popular application is SSH
+There are many applications of public key cryptography and one popular application is SSH
 authentication/login. You might have done this before for other classes, but with our class
 discussion, you can now understand what is going on.
 
