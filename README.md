@@ -74,7 +74,7 @@ encryption, and decryption. `dgst` means that we want to generate a *digest*, wh
 commonly used to refer to a hash. Let's use a different algorithm and check the output.
 
 ```bash
-$ openssl dsgt -sha256 ship.jpg
+$ openssl dgst -sha256 ship.jpg
 $ openssl dgst -sha256 plane.jpg
 ```
 
