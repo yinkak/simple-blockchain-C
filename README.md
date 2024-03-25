@@ -1,4 +1,4 @@
-# Assignment 13: More about Cryptography Function Applications
+# Assignment 12: More about Cryptography Function Applications
 
 As discussed in class, there are three popular types of cryptography, cryptographic hashing, secret
 key cryptography, and public key cryptography. In this assignment, you will do some activities to
