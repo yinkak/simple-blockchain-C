@@ -274,15 +274,15 @@ functions.
 
 ## Grading
 
-* Task 1: 1% (out of the total 10%)
-* Task 2: 9% (out of the total 10%)
-    * 3%: Blockchain with no difficulty
-        * 1%: `bc_add_block()` successfully adds one block (the first block).
-        * 2%: `bc_add_block()` successfully adds multiple blocks.
-    * 6%: Blockchain with difficulty
-        * 2%: `bc_add_block()` successfully adds one block (the first block).
-        * 2%: `bc_add_block()` successfully adds multiple blocks.
-        * 2%: `bc_verify()` successfully verifies the blockchain.
+* [10 pts] Task 1
+* [90 pts] Task 2
+    * [30 pts] Blockchain with no difficulty
+        * [10 pts] `bc_add_block()` successfully adds one block (the first block).
+        * [20 pts] `bc_add_block()` successfully adds multiple blocks.
+    * [60 pts] Blockchain with difficulty
+        * [20 pts] `bc_add_block()` successfully adds one block (the first block).
+        * [20 pts] `bc_add_block()` successfully adds multiple blocks.
+        * [20 pts] `bc_verify()` successfully verifies the blockchain.
 * Code that does not compile with CMake gets a 0.
 * Code that does not generate all the required executables gets a 0.
 * Memory issues have a penalty of -10 pts. Use appropriate sanitizers and enable the debug option.
