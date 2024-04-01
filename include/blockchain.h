@@ -17,7 +17,7 @@ struct block {
 };
 
 struct blockchain {
-  struct block[MAX_NUM_BLOCKS];
+  struct block block[MAX_NUM_BLOCKS];
   size_t count;
   unsigned char difficulty[EVP_MAX_MD_SIZE]; // the hash of the current block.
 };
