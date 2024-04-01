@@ -189,27 +189,40 @@ is called *mining* since it requires a lot of computational power to find the co
 analogous to mining for precious metals such as gold. In Bitcoin, the miners are rewarded with new
 Bitcoins for successfully mining a new block.
 
-In this task, you will implement a simple blockchain. We start with the background first.
+In this task, you will implement a simple blockchain.
 
-## Background
+## Block
 
-Each block is a data structure that contains the following fields.
+Each block is a data structure defined in [`include/blockchain.h`](include/blockchain.h). It
+contains the following fields.
 
 * `index`: the index of the block in the blockchain.
 * `timestamp`: the time when the block was created.
 * `data`: the data that the block contains.
-* `previous_hash`: the hash of the previous block.
+* `p_hash`: the hash of the previous block.
 * `nonce`: a random number that is used to create a hash that satisfies a certain condition.
 * `hash`: the hash of the current block.
 
 Each block should satisfy the following conditions.
 
 * The hash of a block is created by hashing the entire block using SHA256.
-* The hash of a block should start with the number of zeros provided as a command-line argument
-  described below. For this, you need to find the correct nonce by trying different nonces until you
-  find the one that creates a hash that satisfies the condition.
-* The hash of the current block should match the `previous_hash` field of the next block.
-* The `previous_hash` field of the first block is `0`. You still need to find the correct nonce for
-  the first block that satisfies the hash condition.
-* The `data` field of each block is a string provided as an argument for the `add_block()` function
-  described below.
+* `index` should start from `0` (for the first block) and increase monotonically by one for each new
+  block.
+* `timestamp` should contain the creation time of each block.
+* `data` should store the bytes passed as an argument for the `bc_add_block()` function described
+  below.
+* The hash of a block should start with the number of zeros provided as an argument for
+  `bc_add_block()` described below. For this, your program needs to find a correct nonce by trying
+  different nonces until it finds the one that creates a hash that satisfies the condition.
+* The hash of the current block should match the `p_hash` field of the next block.
+* The `p_hash` field of the first block is `0`. You still need to find the correct nonce for the
+  first block that satisfies the hash condition.
+
+## Blockchain
+
+A blockchain is a data structure that contains an array of blocks. It should support the following
+functions.
+
+* `bc_init()`
+* `bc_add_block()`
+* `bc_verify()`
