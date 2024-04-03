@@ -19,7 +19,7 @@ metals such as gold. One needs to try a very large number of different nonces to
 creates a hash that satisfies the condition. In Bitcoin, miners are rewarded with new Bitcoins for
 successfully mining a new block.
 
-Below are the details of what you need to implement.
+In this assignment, you will implement a simple blockchain.
 
 ## Block
 
