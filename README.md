@@ -75,14 +75,8 @@ functions.
 
 ## Implementation
 
-* When you open a source file, you might see an error saying that a header file is not found. If
-  that's the case, generate a `compile_commands.json` file by adding the following line to your
-  `CMakeLists.txt` and running `cmake`.
-
-    ```cmake
-    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-    ```
-
+* Nonce: you need to implement your own way of finding a correct nonce. You can use any method you
+  like, but you need to find a nonce that satisfies the hash condition.
 * SHA256: you need to use the OpenSSL `libcrypto` library to generate a SHA256 hash. OpenSSL's man
   page for
   [ossl-guide-libcrypto-introduction](https://www.openssl.org/docs/man3.2/man7/ossl-guide-libcrypto-introduction.html)
@@ -90,18 +84,17 @@ functions.
   Algorithms in
   Applications](https://www.openssl.org/docs/man3.2/man7/ossl-guide-libcrypto-introduction.html#USING-ALGORITHMS-IN-APPLICATIONS)
   provides an example that shows how to generate a SHA256 hash.
-* Nonce: you need to implement your own way of finding a correct nonce. You can use any method you
-  like, but you need to find a nonce that satisfies the hash condition.
+* You need to link your code against `libcrypto` as well.
+* You need to link against a shared library under `lib/` that the test cases use, which is
+  platform-dependent. You need to use the appropriate one for your platform.
+    * For Intel machines, use `libcheck-x86_64.so`.
+    * For ARM machines, use `libcheck-aarch64.so`.
 
 ## Code Structure and CMake
 
 * You need to use the same code structure as previous assignments with `src/` and `include/`.
 * You also need to write `CMakeLists.txt` that produces one executable, `blockchain`. The executable
   should run the main function in `src/main.c`.
-* You need to link against a shared library under `lib/` that the test cases use, which is
-  platform-dependent. You need to use the appropriate one for your platform.
-    * For Intel machines, use `libcheck-x86_64.so`.
-    * For ARM machines, use `libcheck-aarch64.so`.
 * You need to set the `CC` and `CXX` environment variables to `clang` and `clang++`. If you haven't,
   open your ~/.zshrc and add the following two commands at the end.
 
@@ -109,6 +102,14 @@ functions.
   export CC=$(which clang)
   export CXX=$(which clang++)
   ```
+
+* When you open a source file, you might see an error saying that a header file is not found. If
+  that's the case, generate a `compile_commands.json` file by adding the following line to your
+  `CMakeLists.txt` and running `cmake`.
+
+    ```cmake
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    ```
 
 ## Grading
 
