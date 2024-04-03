@@ -4,10 +4,10 @@ A blockchain is a popular data structure that is used in many applications, most
 world of cryptocurrencies. A blockchain is a data structure that consists of blocks, where each
 block contains data. Each block also contains a hash of the previous block, which creates a chain of
 blocks. This is a simple way to ensure that the data in the blocks is not tampered with. If you
-change the data in one block, the hash of that block will change, and the hash of the next block
-will no longer match the hash in the previous block. Thus, if you want to successfully tamper with
-the data in a block, you need to tamper with all the blocks that come after it, which can be a
-computationally challenging task.
+change the data in one block, the hash of that block will change, and it will no longer match the
+hash stored in the next block. Thus, if you want to successfully tamper with the data in a block,
+you need to tamper with all the blocks that come after it, which can be a computationally
+challenging task.
 
 To make it even more challenging, a typical blockchain requires that newly-generated blocks meet
 certain conditions. For example, Bitcoin, a popular cryptocurrency, has a *target hash* and new
