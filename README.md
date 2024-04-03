@@ -77,7 +77,7 @@ functions.
 
 * When you open a source file, you might see an error saying that a header file is not found. If
   that's the case, generate a `compile_commands.json` file by adding the following line to your
-  CMakeLists.txt.
+  `CMakeLists.txt` and running `cmake`.
 
     ```cmake
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
