@@ -75,6 +75,14 @@ functions.
 
 ## Implementation
 
+* When you open a source file, you might see an error saying that a header file is not found. If
+  that's the case, generate a `compile_commands.json` file by adding the following line to your
+  CMakeLists.txt.
+
+    ```cmake
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    ```
+
 * SHA256: you need to use the OpenSSL `libcrypto` library to generate a SHA256 hash. OpenSSL's man
   page for
   [ossl-guide-libcrypto-introduction](https://www.openssl.org/docs/man3.2/man7/ossl-guide-libcrypto-introduction.html)
@@ -88,7 +96,8 @@ functions.
 ## Code Structure and CMake
 
 * You need to use the same code structure as previous assignments with `src/` and `include/`.
-* You also need to write `CMakeLists.txt` that produces one executable, `blockchain`.
+* You also need to write `CMakeLists.txt` that produces one executable, `blockchain`. The executable
+  should run the main function in `src/main.c`.
 * You need to link against a shared library under `lib/` that the test cases use, which is
   platform-dependent. You need to use the appropriate one for your platform.
     * For Intel machines, use `libcheck-x86_64.so`.
