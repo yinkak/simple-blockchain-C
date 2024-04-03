@@ -9,6 +9,7 @@
 #include <string.h>
 
 #define MAX_POINTS 100
+#define NUM_TRIALS 4
 
 int total_pts = 0;
 
@@ -87,7 +88,7 @@ int test1(void) {
 int test2(void) {
   printf("Running test 2 (adding one block with a difficulty)\n");
 
-  size_t trials = 4;
+  size_t trials = NUM_TRIALS;
   struct blockchain bc;
 
   for (size_t i = 0; i < trials; i++) {
@@ -109,7 +110,7 @@ int test2(void) {
 int test3(void) {
   printf("Running test 3 (adding multiple blocks with a difficulty)\n");
 
-  size_t trials = 4;
+  size_t trials = NUM_TRIALS;
   struct blockchain bc;
 
   for (size_t i = 0; i < trials; i++) {
