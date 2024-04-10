@@ -68,8 +68,7 @@ functions.
   for your code. The function should return `0` for success and `-1` for failure.
 * `bc_add_block()`: adds a new block to the blockchain. It should create a new block, set the fields
   of the block, and find the correct nonce that satisfies the hash condition. It should then add the
-  block to the blockchain. It should return the index of the new block for success and `-1` for
-  failure.
+  block to the blockchain. It should return `0` for success and `-1` for failure.
 * `bc_verify()`: verifies the blockchain. It should check if the hash of each block is correct and
   matches the `p_hash` field of the next block. It should also check if the hash of each block
   satisfies the difficulty condition. It should return `0` for success and `-1` for failure.
