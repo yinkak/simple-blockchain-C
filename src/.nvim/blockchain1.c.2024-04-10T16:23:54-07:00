@@ -1,0 +1,152 @@
+#include "blockchain.h"
+#include "check.h"
+#include <limits.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+unsigned char *
+hash_block(struct block *block) // change it to return an unsigned char...
+{
+  EVP_MD_CTX *mdctx;
+  const EVP_MD *md;
+  unsigned char *md_value = malloc(EVP_MAX_MD_SIZE);
+  unsigned int md_len;
+
+  OpenSSL_add_all_digests();
+
+  md = EVP_sha256();
+
+  mdctx = EVP_MD_CTX_new();
+  EVP_DigestInit_ex(mdctx, md, NULL);
+  EVP_DigestUpdate(mdctx, &block->core, sizeof(struct block_core));
+  EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+  EVP_MD_CTX_free(mdctx);
+
+  return md_value;
+}
+
+/*struct block_core create_core(size_t i, unsigned char data, unsigned char
+prev_hash[SHA256_DIGEST_LENGTH])
+{
+    struct block_core *core = malloc(sizeof(struct block_core));
+    core->index = i;
+    memcpy(core->data, &data, 1);
+    memcpy(core->p_hash, prev_hash, SHA256_DIGEST_LENGTH);
+    core->nonce = 0;
+    return core;
+}*/
+
+struct block_core *create_core(size_t i, const char *data,
+                               const unsigned char *prev_hash) {
+  struct block_core *core = malloc(sizeof(struct block_core));
+
+  if (core == NULL) {
+    // Handle memory allocation failure
+    return NULL;
+  }
+  printf("done making core \n");
+  core->index = i;
+  printf("step 2: setting index done...\n");
+  strncpy(core->data, data, DATA_SIZE - 1); // Ensure null-terminated string
+  printf("step 3: setting data done... \n");
+  printf("previous hash: %s ...\n", prev_hash);
+  // printf("size of previous hash: %d \n", strlen(prev_hash));
+  if (i == 0) {
+    for (int j = 0; j < SHA256_DIGEST_LENGTH; j++) {
+      core->p_hash[j] = 0;
+    }
+  }
+
+  if (prev_hash != NULL) {
+    memcpy(core->p_hash, prev_hash, SHA256_DIGEST_LENGTH);
+  }
+  printf("step 4: setting previous hash done \n");
+  core->nonce = 0;
+  return core;
+}
+
+int find_nonce(struct blockchain *bc) {}
+
+int bc_init(struct blockchain *bc,
+            unsigned char difficulty[SHA256_DIGEST_LENGTH]) {
+  bc->count = 0;
+  char diff[SHA256_DIGEST_LENGTH];
+
+  for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+    diff[i] = difficulty[i];
+  }
+  return 0;
+}
+
+int bc_add_block(struct blockchain *bc, const unsigned char data[DATA_SIZE]) {
+  if (bc->count >= BLOCKCHAIN_SIZE) {
+    perror("blockchain is full, unable to  add new blocks.\n");
+    return -1;
+  }
+  printf("blockchain is not full\n");
+  if (bc->count == 0) // empty block chain
+  {
+    printf("count = %d \n", bc->count);
+    struct block *head = malloc(sizeof(struct block));
+
+    if (head == NULL) {
+      perror("Failed to allocate memory for the head block.");
+      free(head);
+      return -1;
+    }
+    printf(
+        "done allocating space for head, now entering create core instance\n");
+    struct block_core *core = create_core(0, &data, NULL);
+    if (core == NULL) {
+      perror("Failed to create the core of the head block.");
+      free(head); // Free allocated memory if core creation fails
+      return -1;
+    }
+    printf("core created not assigned...\n");
+    head->core = *core;
+    print("what is the actual data? \n");
+    // printf("core->data: %s", head->core.data);
+    printf("actual data: ");
+    for (int z = 0; z < DATA_SIZE; z++) {
+      printf("%s ", data[z]);
+    }
+    // head->core = create_core(0, data, NULL);
+    printf("core created! no hash yet though! \n");
+    unsigned char *hash_head = hash_block(head);
+    if (hash_head != NULL) {
+      memcpy(head->hash, hash_head, SHA256_DIGEST_LENGTH);
+      free(hash_head);
+    }
+
+    else {
+      perror("Failed to generate the hash of the head block.");
+      return -1;
+    }
+
+    bc->blocks[0] = *head;
+    bc->count += 1;
+    free(head);
+    free(core);
+    return 0;
+  }
+}
+
+int bc_verify(struct blockchain *bc) {}
+
+// int set_difficulty(size_t num_zeros,
+//                    unsigned char difficulty[SHA256_DIGEST_LENGTH]) {}
+// int check_block(size_t index, struct block *b, unsigned char
+// data[DATA_SIZE],
+//                 unsigned char p_hash[SHA256_DIGEST_LENGTH]) {}
+
+// int check_blockchain(struct blockchain *bc,
+//                    unsigned char data[BLOCKCHAIN_SIZE][DATA_SIZE]) {}

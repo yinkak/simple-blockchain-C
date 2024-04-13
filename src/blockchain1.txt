@@ -1,0 +1,230 @@
+#include "blockchain.h"
+#include "check.h"
+#include <limits.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+unsigned char *
+hash_block(struct block *block) // change it to return an unsigned char...
+{
+  EVP_MD_CTX *mdctx;
+  const EVP_MD *md;
+  unsigned char *md_value = malloc(EVP_MAX_MD_SIZE);
+  unsigned int md_len;
+
+  OpenSSL_add_all_digests();
+
+  md = EVP_sha256();
+
+  mdctx = EVP_MD_CTX_new();
+  EVP_DigestInit_ex(mdctx, md, NULL);
+  EVP_DigestUpdate(mdctx, &block->core, sizeof(struct block_core));
+  EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+  EVP_MD_CTX_free(mdctx);
+
+  return md_value;
+}
+
+/*struct block_core create_core(size_t i, unsigned char data, unsigned char
+prev_hash[SHA256_DIGEST_LENGTH])
+{
+    struct block_core *core = malloc(sizeof(struct block_core));
+    core->index = i;
+    memcpy(core->data, &data, 1);
+    memcpy(core->p_hash, prev_hash, SHA256_DIGEST_LENGTH);
+    core->nonce = 0;
+    return core;
+}*/
+
+struct timespec get_current_time() {
+  struct timespec current_time;
+  if (clock_gettime(CLOCK_REALTIME, &current_time) == -1) {
+    perror("Failed to get time");
+    exit(-1);
+  }
+  return current_time;
+}
+
+uint32_t get_nonce() {
+  uint32_t nonce = (uint32_t)rand();
+  //printf("nonce value generated: %u \n", nonce);
+  return nonce;
+}
+
+struct block_core *
+create_core(size_t i, const char data[DATA_SIZE],
+            const unsigned char prev_hash[SHA256_DIGEST_LENGTH]) {
+  struct block_core *core = malloc(sizeof(struct block_core));
+
+  if (core == NULL) {
+    // Handle memory allocation failure
+    return NULL;
+  }
+  // printf("done making core \n");
+  core->index = i;
+  // printf("step 2: setting index done...\n");
+  memcpy(core->data, data, DATA_SIZE); // Ensure null-terminated string
+  // printf("core-> data: %s\n", core->data);
+  // printf("data: %s\n" , data);
+  // printf(" memcmp: %d\n", memcmp(core->data, data, DATA_SIZE ));
+  // assert(!memcmp(core->data, data, DATA_SIZE));
+  // printf("step 3: setting data done... \n");
+  // printf("previous hash: %s ...\n", prev_hash);
+  //  printf("size of previous hash: %d \n", strlen(prev_hash));
+  if (i == 0) {
+    for (int j = 0; j < SHA256_DIGEST_LENGTH; j++) {
+      core->p_hash[j] = 0;
+    }
+  } else if (i != 0) {
+    for (int j = 0; j < SHA256_DIGEST_LENGTH; j++) {
+      core->p_hash[j] = prev_hash[0];
+    }
+  }
+
+  if (prev_hash != NULL) {
+    memcpy(core->p_hash, prev_hash, SHA256_DIGEST_LENGTH);
+  }
+  // printf("step 4: setting previous hash done \n");
+  core->nonce = get_nonce();
+  //printf("Nonce set to :%u \n ", core->nonce);
+  core->timestamp = get_current_time();
+  // printf( "Timestamp set to: %d \n", core->timestamp );
+  return core;
+}
+
+
+int bc_init(struct blockchain *bc,
+            unsigned char difficulty[SHA256_DIGEST_LENGTH]) {
+  bc->count = 0;
+  char diff[SHA256_DIGEST_LENGTH];
+
+  for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+    diff[i] = difficulty[i];
+  }
+  return 0;
+}
+
+int bc_add_block(struct blockchain *bc, const unsigned char data[DATA_SIZE]) {
+  if (bc->count >= BLOCKCHAIN_SIZE) {
+    perror("blockchain is full, unable to  add new blocks.\n");
+    return -1;
+  }
+  if (bc->count == 0) // empty block chain
+  {
+    
+    struct block *head = malloc(sizeof(struct block));
+
+    if (head == NULL) {
+      perror("Failed to allocate memory for the head block.");
+      free(head);
+      return -1;
+    }
+    struct block_core *core = create_core(0, data, NULL);
+    
+    if (core == NULL) {
+      perror("Failed to create the core of the head block.");
+      free(head); // Free allocated memory if core creation fails
+      return -1;
+    }
+    
+    head->core = *core;
+    unsigned char *hash_head = hash_block(head);
+    if (hash_head != NULL) {
+      memcpy(head->hash, hash_head, SHA256_DIGEST_LENGTH);
+      free(hash_head);
+    }
+
+    else {
+      perror("Failed to generate the hash of the head block.");
+      return -1;
+    }
+    if (bc->blocks[bc->count].core.nonce < bc->difficulty) {
+      bc->blocks[0] = *head;
+      bc->count += 1;
+    }
+    
+    free(head);
+    free(core);
+    return 0;
+  }
+
+  else if (bc->count > 0) // non empty block chain
+  {
+    // printf("count = %d \n", bc->count);
+    struct block *head = malloc(sizeof(struct block));
+
+    if (head == NULL) {
+      perror("Failed to allocate memory for the head block.");
+      free(head);
+      return -1;
+    }
+    struct block_core *core =
+        create_core(bc->count, data, bc->blocks[bc->count - 1].hash);
+
+    if (core == NULL) {
+      perror("Failed to create the core of the head block.");
+      free(head); // Free allocated memory if core creation fails
+      return -1;
+    }
+
+    head->core = *core;
+    unsigned char *hash_head = hash_block(head);
+    if (hash_head != NULL) {
+      memcpy(head->hash, hash_head, SHA256_DIGEST_LENGTH);
+      free(hash_head);
+    }
+
+    else {
+      perror("Failed to generate the hash of the head block.");
+      return -1;
+    }
+
+    if (bc->blocks[bc->count].core.nonce < bc->difficulty) {
+      bc->blocks[bc->count] = *head;
+      bc->count += 1;
+    }
+    free(head);
+    free(core);
+    return 0;
+  }
+}
+
+int bc_verify(struct blockchain *bc) {
+  /* Check that each block in the chain is valid according to its predecessor */
+  for (int i = bc->count -1; i  > 1; --i) {
+    // checking the hash of each block
+    if(memcmp(bc-> blocks[i].core.p_hash, bc->blocks[i -1].hash, SHA224_DIGEST_LENGTH) !=  0)
+  {
+      printf("\nHash does not match at index  %d\n", i+1);
+      printf("hash of previous block : ");
+      for(int j = 0; j < SHA256_DIGEST_LENGTH; j++)
+      printf("%x ", bc -> blocks[i -1].core.p_hash[j]);
+      
+      printf("\nHash in current block : ");
+      for(int k= 0 ; k < SHA256_DIGEST_LENGTH;k++){
+        printf("%x ", bc -> blocks [i].core.p_hash[k]);
+      }
+      return -1;
+  }
+  // checking difficulty
+  if (bc->blocks[i].core.nonce > bc->difficulty){
+        printf("\nBlock %d: nonce too high", i+1);
+	return -1;
+    }
+  }
+  /* The genesis block should have a null pre-hash */
+  if (bc->blocks[0].core.p_hash != NULL ){
+    printf("\nGenesis block has wrong pre-hash\n");
+    return -1;
+  }
+  return 0;
+}

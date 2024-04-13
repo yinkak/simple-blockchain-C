@@ -28,7 +28,6 @@ struct blockchain {
                                                   // hash needs to satisfy.
 };
 
-int bc_init(struct blockchain *bc,
-            unsigned char difficulty[SHA256_DIGEST_LENGTH]);
+int bc_init(struct blockchain *bc, unsigned char difficulty[SHA256_DIGEST_LENGTH]);
 int bc_add_block(struct blockchain *bc, const unsigned char data[DATA_SIZE]);
 int bc_verify(struct blockchain *bc);

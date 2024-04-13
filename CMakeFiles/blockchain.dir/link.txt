@@ -1,0 +1,1 @@
+/usr/bin/clang -lcrypto -lrt CMakeFiles/blockchain.dir/src/blockchain2.c.o CMakeFiles/blockchain.dir/src/main.c.o -o blockchain   -L/home/cmpt201/a12-yinkak/lib  -Wl,-rpath,/home/cmpt201/a12-yinkak/lib -lcheck-aarch64 

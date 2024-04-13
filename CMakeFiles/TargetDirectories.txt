@@ -1,0 +1,3 @@
+/home/cmpt201/a12-yinkak/CMakeFiles/blockchain.dir
+/home/cmpt201/a12-yinkak/CMakeFiles/edit_cache.dir
+/home/cmpt201/a12-yinkak/CMakeFiles/rebuild_cache.dir

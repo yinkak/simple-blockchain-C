@@ -1,0 +1,75 @@
+#include "blockchain.h"
+#include "check.h"
+#include <limits.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+unsigned char *hash_block(struct block *block) // change it to return an unsigned char...
+{
+  EVP_MD_CTX *mdctx;
+  const EVP_MD *md;
+  unsigned char *md_value = malloc(EVP_MAX_MD_SIZE);
+  unsigned int md_len;
+
+  OpenSSL_add_all_digests();
+
+  md = EVP_sha256();
+
+  mdctx = EVP_MD_CTX_new();
+  EVP_DigestInit_ex(mdctx, md, NULL);
+  EVP_DigestUpdate(mdctx, &block->core, sizeof(struct block_core));
+  EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+  EVP_MD_CTX_free(mdctx);
+
+  return md_value;
+}
+
+struct timespec get_current_time() {
+  struct timespec current_time;
+  if (clock_gettime(CLOCK_REALTIME, &current_time) == -1) {
+    perror("Failed to get time");
+    exit(-1);
+  }
+  return current_time;
+}
+
+uint32_t get_nonce() 
+{
+  uint32_t nonce = (uint32_t)rand();
+  return nonce;
+}
+
+struct block_core *create_core(size_t i, const char data[DATA_SIZE],const unsigned char prev_hash[SHA256_DIGEST_LENGTH])
+{
+  struct block_core *core = malloc(sizeof(struct block_core));
+  if (core == NULL) {
+    // Handle memory allocation failure
+    return NULL;
+  }
+  core->index = i;
+  memcpy(core->data, data, DATA_SIZE); // Ensure null-terminated string
+  if (i == 0) {
+    for (int j = 0; j < SHA256_DIGEST_LENGTH; j++) {
+      core->p_hash[j] = 0;
+    }
+  } else if (i != 0) {
+    for (int j = 0; j < SHA256_DIGEST_LENGTH; j++) {
+      core->p_hash[j] = prev_hash[0];
+    }
+  }
+  if (prev_hash != NULL) {
+    memcpy(core->p_hash, prev_hash, SHA256_DIGEST_LENGTH);
+  }
+  core->nonce = get_nonce();
+  core->timestamp = get_current_time();
+  return core;
+}

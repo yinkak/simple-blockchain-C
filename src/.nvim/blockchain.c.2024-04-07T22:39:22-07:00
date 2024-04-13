@@ -1,0 +1,177 @@
+#include "blockchain.h"
+#include "check.h"
+#include <limits.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <string.h>
+
+
+struct block head = NULL;
+
+/*struct timespec get_current_time() {
+    struct timespec current_time;
+    if(clock_gettime(CLOCK_REALTIME, &current_time) == -1)
+    {
+        perror("Failed to get time");
+        exit(-1);
+    }
+    return current_time;
+}*/
+
+unsigned char* hash_block(struct block* block)// change it to return an unsigned char...
+{
+    SHA256_CTX ctx;
+    SHA256_Init(&ctx);
+
+    // Update the context with the data in the block's core
+    SHA256_Update(&ctx, &block->core, sizeof(struct block_core));
+
+    // Finalize the hash and store it in the block's hash field
+    SHA256_Final(block->hash, &ctx);
+    return block->hash;
+}
+
+struct block_core create_core(size_t index, unsigned char data)
+{
+    struct block_core core;
+    core.index= 0;
+    //struct timespec timestamp = get_current_time();
+    //core.timestamp = 0;
+    memcpy(core.data, &data, 1);
+    // Initialize p_hash and nonce fields
+    //memset(core.p_hash, 0, SHA256_DIGEST_LENGTH); // Assuming p_hash is a byte array
+    core.nonce = 0;
+
+    return core;
+}
+
+struct block create_block( struct block *block)
+{
+    // If no argument was passed, use an empty block
+    if (block==NULL)
+    {
+       block = malloc(sizeof(struct block));
+       *block = create_block(NULL);
+    }
+    else
+        //block->core = create_core();
+
+    return *block;
+}
+int bc_init(struct blockchain *bc, unsigned char difficulty[SHA256_DIGEST_LENGTH])
+{
+    if (bc == NULL || difficulty == NULL)
+    {
+        fprintf(stderr,"Invalid arguments\n");
+        return -1;
+    }
+    struct block head;//might have to use dynamic memory allocation and a pointer for this
+    head.core.index = 0;
+    //initialize the head;
+    bc-> blocks[0] = head;
+
+    bc->count = 1;//make it zero maybe?
+    for(int i = 0; i< SHA256_DIGEST_LENGTH; i++)
+    {
+        bc->difficulty[i] = difficulty[i];
+    }
+    return 0;
+}
+
+int bc_add_block(struct blockchain *bc, const unsigned char data[DATA_SIZE])
+{
+    if  (bc == NULL || data == NULL)
+    {
+        fprintf(stderr,"Null pointer exception\n");
+        return -1;
+    }
+    //iterate through the list  of blocks using a pointer
+    int i = 0;
+    {
+        while (i < bc-> count)
+        {
+            struct block* current =  &(bc -> blocks[i]);
+            
+            /* If no data is given, just add an empty block */
+            if (&(bc->blocks[i]) == NULL)
+            {
+                //initialize an empty block
+                //return 0;
+            }
+            else
+            {
+               /* Check that the new data does not match any existing data in the chain.*/
+               for(int j = 0; j< bc->count; j++)
+               {
+                if(bc->blocks->hash[i] == bc->blocks->hash[j])
+                {
+                    printf("hashes of block %d and %d  are equal. unable to add block...\n",i,j);
+                    return -1;
+                }
+               }
+               {
+                //code that
+                //do not return 0 yet do that after  you check all the data
+               }
+
+            }
+        }
+    }
+    if(bc-> count < BLOCKCHAIN_SIZE)
+    {
+        /* Add the new block at the end of the chain */
+        struct block new_block;
+        new_block.core = create_core(bc->count, data);
+        unsigned char *hash = hash_block(&new_block);
+        memcpy(new_block.hash, hash, SHA256_DIGEST_LENGTH);//might be a memory leak here!
+        //loop this
+        unsigned char p_hash[SHA224_DIGEST_LENGTH];
+        //memset(p_hash,  0, SHA224_DIGEST_LENGTH); might uncomment later
+        for(int i = 0; i< SHA256_DIGEST_LENGTH; i++)
+        {
+            p_hash[i] = bc->blocks[bc->count-1].hash[i]; // basically copying the data from the previous hash
+        }
+        // Add the new block to the blockchain
+        bc->blocks[bc->count] = new_block;
+        bc->count ++;
+        free(hash);
+        return 0;
+    }
+    else
+    {
+        printf( "Blockchain is full.\n" );
+        return -1;
+    }
+    
+}
+
+int bc_verify(struct blockchain *bc)
+{
+
+}
+
+int set_difficulty(size_t num_zeros, unsigned char difficulty[SHA256_DIGEST_LENGTH])
+{
+
+}
+
+int check_block(size_t index, struct block *b, unsigned char data[DATA_SIZE], unsigned char p_hash[SHA256_DIGEST_LENGTH])
+{
+
+}
+
+int check_blockchain(struct blockchain *bc, unsigned char data[BLOCKCHAIN_SIZE][DATA_SIZE])
+{
+    
+}
+

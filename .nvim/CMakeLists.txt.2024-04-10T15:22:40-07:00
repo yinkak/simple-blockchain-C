@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.14)
+project(
+  blockchain
+  VERSION 1.0
+  DESCRIPTION "blockchain Assignment")
+include_directories(include)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(LIBRARY_PATHS lib)
+find_library(
+  CHECK_LIBRARY
+  NAMES "libcheck-aarch64.so"
+  PATHS ${LIBRARY_PATHS})
+
+file(GLOB SOURCES "src/*.c")
+add_executable(blockchain ${SOURCES})
+target_compile_options(blockchain PUBLIC -g)
+find_package(OpenSSL REQUIRED)
+add_link_options(-lcrypto -lrt)
+# target_link_libraries(blockchain OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(blockchain  crypto ~/a12-yinkak/lib/libcheck-aarch64.so)

@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/cmpt201/a12-yinkak",
+  "command": "/usr/bin/clang  -I/home/cmpt201/a12-yinkak/include  -o CMakeFiles/blockchain.dir/src/blockchain2.c.o -c /home/cmpt201/a12-yinkak/src/blockchain2.c",
+  "file": "/home/cmpt201/a12-yinkak/src/blockchain2.c"
+},
+{
+  "directory": "/home/cmpt201/a12-yinkak",
+  "command": "/usr/bin/clang  -I/home/cmpt201/a12-yinkak/include  -o CMakeFiles/blockchain.dir/src/main.c.o -c /home/cmpt201/a12-yinkak/src/main.c",
+  "file": "/home/cmpt201/a12-yinkak/src/main.c"
+}
+]
